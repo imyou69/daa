@@ -1,48 +1,73 @@
-#include<stdio.h>
-int v[10];
-void bfs(int n,int a[][10],int s)
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_NODES 100
+typedef struct Node 
 {
-int i,q[10],u;
-int f=0,r=-1;
-v[s]=1;
-q[++r]=s;
-while(f<=r)
+int id;
+int dependencies[MAX_NODES];
+int numDependencies;
+bool visited;
+} Node;
+Node nodes[MAX_NODES];
+int numNodes;
+void initializeNodes() 
 {
-u=q[f++];
-for(i=1;i<=n;i++)
-if(a[u][i]==1&&v[i]==0)
+int i;
+for (i = 0; i < MAX_NODES; i++) 
 {
-q[++r]=i;
-v[i]=1;
+nodes[i].id = i;
+nodes[i].numDependencies = 0;
+nodes[i].visited = false;
+}
+numNodes = 0;
+}
+void addDependency(int from, int to)
+{
+nodes[to].dependencies[nodes[to].numDependencies] = from;
+nodes[to].numDependencies++;
+}
+void topologicalSort() 
+{
+int i, j;
+int numVisited = 0;
+bool noDependencies;
+while (numVisited < numNodes) 
+{
+noDependencies = true;
+for (i = 0; i < numNodes; i++) 
+{
+if (!nodes[i].visited) 
+{
+for (j = 0; j < nodes[i].numDependencies; j++) 
+{
+if (!nodes[nodes[i].dependencies[j]].visited)
+{
+noDependencies = false;
+break;
+}
+}
+if (noDependencies) 
+{
+printf("%d ", nodes[i].id);
+nodes[i].visited = true;
+numVisited++;
+break;
 }
 }
 }
-int main()
-{
-int n,a[10][10],i,j,s;
-printf("enter the no of node\n");
-scanf("%d",&n);
-printf("enter the adjacency matrix\n");
-for(i=1;i<=n;i++)
-{
-for(j=1;j<=n;j++)
-{
-scanf("%d",&a[i][j]);
 }
 }
-printf("enter the source\n");
-scanf("%d",&s);
-for(i=1;i<=n;i++)
+int main() 
 {
-v[i]=0;
-}
-bfs(n,a,s);
-for(i=1;i<=n;i++)
-{
-if(v[i]==0)
-printf("\n the node %d is not reachable\n",i);
-else
-printf("\n the node %d is reachable\n",i);
-}
+initializeNodes();
+addDependency(1, 3);
+addDependency(2, 3);
+addDependency(3, 4);
+addDependency(3, 5);
+addDependency(4, 6);
+addDependency(5, 6);
+numNodes = 7; 
+printf("Topological Order: ");
+topologicalSort();
 return 0;
-} 
+}
